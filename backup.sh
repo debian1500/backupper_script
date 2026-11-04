@@ -44,16 +44,16 @@ DEST_LOG="${DEST_DATE}/${DATE_CURRENT}.log"
 #DEST_LOG_BASENAME="$(basename "$DEST_LOG")"
 $SSH_COMMAND "touch '$DEST_LOG'"
 
-echo -e "[START] $(DATE_SECS) Создана папка назначения $DEST_DATE и лог-файл ${DATE_CURRENT}.log" | $SSH_COMMAND "cat >> "$DEST_LOG"
+echo -e "[START] $(DATE_SECS) Создана папка назначения $DEST_DATE и лог-файл ${DATE_CURRENT}.log" | $SSH_COMMAND "cat >> "'$DEST_LOG'"
 
 # Папки, подлежащие копированию
-COPYDIRS=(
-"documents"
-)
+COPYDIRS="documents"
 
-echo -e "[INFO] Папки для копирования:\n" >> "$DEST_LOG"
+# Выводим список папок
 
-for COPYDIR in "$COPYDIRS" do echo -e "  ${SOURCE_ROOT}/${COPYDIR}\n" >>"$DEST_LOG"; done 
+echo -e "[INFO] Папки для копирования:" | $SSH_COMMAND "cat >> '$DEST_LOG'"
+
+for COPYDIR in "$COPYDIRS"; do echo -e "  ${SOURCE_ROOT}/${COPYDIR}\n" >>"$DEST_LOG"; done 
 
 
 # ========= 2. Архивация
@@ -62,7 +62,7 @@ echo
 for COPYDIR in "${COPYDIRS[@]}"; do
   ROOT_COPYDIR="${SOURCE_ROOT}/${COPYDIR}"
   if [ -d "${ROOT_COPYDIR}" ]; then
-    tar -cJ -C "${ROOT_COPYDIR}" . | $SSH_COMMAND "cat > '${DEST_DATE}/${COPYDIR}.tar.xz'"
+    tar -cz -C "${ROOT_COPYDIR}" . | $SSH_COMMAND "cat > '${DEST_DATE}/${COPYDIR}.tar.xz'"
   else echo "" # Выводим в пустоту
   fi
 done
