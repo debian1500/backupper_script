@@ -1,0 +1,20 @@
+// WARNING: Pseudocode
+
+backup_location = "/mnt/foobar"
+
+get_date () = { $date hours, minutes, seconds, day, month, year }
+ssh_command = "ssh user@ip -i ~/.ssh/foobarkey"
+$ssh_command "touch $backup_location/$get_date.log"
+# как-то нужно зафиксировать имя лог-файла, так как при след. вызове get_date секунды поменяются и он не найдёт
+# так делать неудобно -> log_file = "$($ssh_command 'find $backup_location' -type f -mtime -1 -name "*.log") | head -1"
+	
+log_write () = { echo -e "[$log_status] [$get_date] $log_text" | $ssh_command "cat >> log_file"}
+
+-----
+
+Пример использования
+
+log_write log_status="INFO" log_text="Starting backup..."
+		
+	
+
